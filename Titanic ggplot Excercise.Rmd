@@ -1,0 +1,74 @@
+---
+title: "Titanic Survival Analysis"
+output: html_notebook
+---
+***
+**Load the titanic clean data created as part of data wrangling excercise into titanic dataframe.**
+
+```{r, echo=TRUE}
+# 0: Load the data in RStudio
+titanicOrginal <- read.csv("titanic_clean.csv")
+titanic <- select (titanicOrginal, pclass, survived, sex, age, has_cabin_number)
+titanic <- filter(titanic, !is.na(pclass) )
+titanic <- mutate(titanic, survived = ifelse(survived == 1, "Survived", "Not Survived"), pclass = factor(pclass), has_cabin_number = factor(ifelse(has_cabin_number == 1, "Has Cabin Number", "No Cabin Number")))
+```
+*NA from pclass is filtered out and meaningful names are given to axis labels*
+
+***
+
+**Plot the total counts of male and female across class**
+
+```{r, echo=TRUE}
+ggplot(titanic, aes(fill = sex, x = pclass)) +
+  geom_bar(position = "dodge")
+```
+
+***
+
+**Plot the survival numbers across sex and class**
+
+```{r, echo=TRUE}
+ggplot(titanic, aes(fill = sex, x = pclass)) +
+  geom_bar(position = "dodge") + 
+  facet_grid(". ~ survived")
+```
+
+***
+
+**Plot the survival number as scatter plot using Jitter with survival status in seperate frames**
+
+```{r, echo=TRUE}
+# Position jitter (use below)
+posn.j <- position_jitter(0.5, 0)
+
+# Use ggplot() for the last instruction
+ggplot(titanic, aes(col = sex, x = pclass, y = age)) +
+  geom_jitter(size = 3, alpha = .5, position = posn.j) + 
+  facet_grid(". ~ survived")
+```
+*The above plot clearly shows survival rate is more in females*
+
+***
+
+**Plot the survival numbers with gender in seperate frames**
+
+```{r, echo=TRUE}
+ggplot(titanic, aes(col = survived, x = pclass, y = age)) +
+  geom_jitter(size = 3, alpha = .5, position = posn.j) + 
+  facet_grid(". ~ sex")
+```
+*This clearly shows passengers in 3rd class irrespective of gender didnt get much chance at survival compared to first class.*
+
+***
+
+**Does cabin number got any significance on survival? data wrangling question**
+
+```{r, echo=TRUE}
+ggplot(titanic, aes(col = survived, x = pclass, y = age)) +
+  geom_jitter(size = 3, alpha = .5, position = posn.j) + 
+  facet_grid(". ~ has_cabin_number")
+```
+*Cabin number is mostly allocated to first class passengers and hence it does appear to have a significance in survival rate*
+
+***
+
